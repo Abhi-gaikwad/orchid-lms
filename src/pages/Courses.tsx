@@ -1,16 +1,42 @@
 import React, { useState } from 'react';
-import { Search, Filter, Clock, Users, Star, Award, BookOpen, Brain, Calculator, Globe, Code, Beaker, Palette, TrendingUp } from 'lucide-react';
+import { Search, Filter, Clock, Users, Star, Award, BookOpen, Brain, Calculator, Globe, Code, Beaker, Palette, TrendingUp, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// Assuming you have a Layout component
 import Layout from '@/components/Layout';
+// Assuming you have a useToast hook from shadcn/ui
+import { useToast } from '@/components/ui/use-toast'; 
+
+// 💡 NEW: Import useCart and types from the Cart file
+import { useCart } from './Cart'; 
+
+// Define the Course interface locally for use in this file
+interface Course {
+  id: number;
+  title: string;
+  category?: string;
+  level: string;
+  duration: string;
+  questions: number;
+  participants: number;
+  rating: number;
+  price: string;
+  tags?: string[];
+  description?: string;
+  thumbnail?: string;
+}
 
 const Courses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedLevel, setSelectedLevel] = useState('all');
+  
+  // 💡 NEW: Get the addToCart function
+  const { addToCart, setIsCartOpen, cartItems } = useCart(); 
+  const { toast } = useToast(); // Assuming useToast is available
 
   const categories = [
     { id: 'all', name: 'All Categories', icon: BookOpen },
@@ -23,7 +49,9 @@ const Courses = () => {
     { id: 'business', name: 'Business', icon: TrendingUp }
   ];
 
-  const exams = [
+  // Note: I've updated the type assertion for the exams array to 'Course[]' 
+  // to ensure type safety with the 'addToCart' function.
+  const exams: Course[] = [
     {
       id: 1,
       title: 'Advanced Mathematics Assessment',
@@ -148,6 +176,36 @@ const Courses = () => {
     }
   };
 
+  // 💡 NEW: Handle adding to cart and showing a toast notification
+  const handleAddToCart = (course: Course) => {
+    const isAlreadyInCart = cartItems.some(item => item.id === course.id);
+
+    if (isAlreadyInCart) {
+      toast({
+        title: "Already in Cart",
+        description: `${course.title} is already in your shopping cart.`,
+        variant: "default",
+      });
+      setIsCartOpen(true);
+      return;
+    }
+
+    addToCart(course);
+    toast({
+      title: "Added to Cart!",
+      description: `${course.title} has been added to your cart.`,
+      action: (
+        <Button 
+          variant="secondary" 
+          onClick={() => setIsCartOpen(true)}
+          className="whitespace-nowrap"
+        >
+          View Cart
+        </Button>
+      ),
+    });
+  };
+
   return (
     <Layout>
       {/* Header Section */}
@@ -262,73 +320,83 @@ const Courses = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredExams.map((exam, index) => (
-              <Card 
-                key={exam.id} 
-                className="learning-card group animate-fadeInUp"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardHeader className="space-y-4">
-                  <div className="flex justify-between items-start">
-                    <Badge className={getLevelColor(exam.level)}>
-                      {exam.level}
-                    </Badge>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-primary">
-                        {exam.price}
-                      </div>
-                    </div>
-                  </div>
-                  <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                    {exam.title}
-                  </CardTitle>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {exam.description}
-                  </p>
-                </CardHeader>
+            {filteredExams.map((exam, index) => {
+                const isInCart = cartItems.some(item => item.id === exam.id);
 
-                <CardContent className="space-y-4">
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span>{exam.duration}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <BookOpen className="h-4 w-4 text-muted-foreground" />
-                      <span>{exam.questions} questions</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span>{exam.participants.toLocaleString()} enrolled</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Star className="h-4 w-4 text-secondary fill-current" />
-                      <span>{exam.rating}</span>
-                    </div>
-                  </div>
+                return (
+                    <Card 
+                      key={exam.id} 
+                      className="learning-card group animate-fadeInUp"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <CardHeader className="space-y-4">
+                        <div className="flex justify-between items-start">
+                          <Badge className={getLevelColor(exam.level)}>
+                            {exam.level}
+                          </Badge>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-primary">
+                              {exam.price}
+                            </div>
+                          </div>
+                        </div>
+                        <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                          {exam.title}
+                        </CardTitle>
+                        <p className="text-muted-foreground text-sm leading-relaxed">
+                          {exam.description}
+                        </p>
+                      </CardHeader>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2">
-                    {exam.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
+                      <CardContent className="space-y-4">
+                        {/* Stats */}
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex items-center space-x-2">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <span>{exam.duration}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <BookOpen className="h-4 w-4 text-muted-foreground" />
+                            <span>{exam.questions} questions</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Users className="h-4 w-4 text-muted-foreground" />
+                            <span>{exam.participants.toLocaleString()} enrolled</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Star className="h-4 w-4 text-secondary fill-current" />
+                            <span>{exam.rating}</span>
+                          </div>
+                        </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-2 pt-2">
-                    <Button className="flex-1 btn-hero-primary">
-                      Start Assessment
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      Preview
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-2">
+                          {exam.tags.map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-2 pt-2">
+                            {/* 💡 MODIFIED: Use Add to Cart button logic */}
+                            <Button 
+                                className="flex-1"
+                                onClick={() => handleAddToCart(exam)}
+                                disabled={isInCart}
+                            >
+                                <ShoppingCart className="w-4 h-4 mr-2" />
+                                {isInCart ? 'In Cart' : (exam.price === 'Free' ? 'Enroll Now' : 'Add to Cart')}
+                            </Button>
+                            <Button variant="outline" size="sm">
+                                Preview
+                            </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                )
+            })}
           </div>
 
           {filteredExams.length === 0 && (

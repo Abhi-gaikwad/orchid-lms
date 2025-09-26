@@ -34,7 +34,7 @@ const About = () => {
     {
       year: "2020",
       title: "Founded",
-      description: "Skillyug was founded with a vision to revolutionize online assessment and adaptive learning."
+      description: "Orchid was founded with a vision to revolutionize online assessment and adaptive learning."
     },
     {
       year: "2021",
@@ -100,7 +100,7 @@ const About = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-6">
             <h1 className="text-4xl lg:text-5xl font-bold font-display text-white">
-              About Skillyug
+              About Orchid
             </h1>
             <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
               We're revolutionizing education through adaptive learning technology, 
@@ -119,7 +119,7 @@ const About = () => {
                 Our Mission
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                At Skillyug, we believe every learner deserves a personalized educational 
+                At Orchid, we believe every learner deserves a personalized educational 
                 experience that adapts to their unique learning style, pace, and goals. 
                 Our mission is to democratize access to high-quality, adaptive assessments 
                 that empower students to achieve their full potential.
@@ -159,7 +159,7 @@ const About = () => {
               Our Core Values
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              These principles guide everything we do at Skillyug
+              These principles guide everything we do at Orchid
             </p>
           </div>
 
@@ -236,7 +236,7 @@ const About = () => {
               Meet Our Team
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              The passionate educators and technologists behind Skillyug
+              The passionate educators and technologists behind Orchid
             </p>
           </div>
 
@@ -244,7 +244,7 @@ const About = () => {
             <div className="relative">
               <img 
                 src={teamImage} 
-                alt="Skillyug team collaboration" 
+                alt="Orchid team collaboration" 
                 className="w-full h-auto rounded-2xl shadow-xl"
               />
             </div>
@@ -323,7 +323,7 @@ const About = () => {
               Join Our Learning Revolution
             </h2>
             <p className="text-xl text-white/90 leading-relaxed">
-              Be part of the future of education. Start your personalized learning journey with Skillyug today.
+              Be part of the future of education. Start your personalized learning journey with Orchid today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="btn-hero-secondary">

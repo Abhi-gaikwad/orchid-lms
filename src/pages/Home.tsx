@@ -42,7 +42,7 @@ const Home = () => {
     {
       name: "Sarah Johnson",
       role: "Computer Science Student",
-      content: "Skillyug helped me identify my weak areas and improve systematically. The adaptive learning is incredible!",
+      content: "Orchid helped me identify my weak areas and improve systematically. The adaptive learning is incredible!",
       rating: 5
     },
     {
@@ -54,7 +54,7 @@ const Home = () => {
     {
       name: "Emily Rodriguez",
       role: "Mathematics Teacher",
-      content: "I use Skillyug to track my students' progress. The analytics provide invaluable insights.",
+      content: "I use Orchid to track my students' progress. The analytics provide invaluable insights.",
       rating: 5
     }
   ];
@@ -171,7 +171,7 @@ const Home = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold font-display mb-4">
-              Why Choose Skillyug?
+              Why Choose Orchid?
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Experience the future of education with our cutting-edge features designed 
@@ -206,7 +206,7 @@ const Home = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold font-display mb-4">
-              How Skillyug Works
+              How Orchid Works
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Get started on your learning journey in just four simple steps
@@ -253,7 +253,7 @@ const Home = () => {
               What Our Students Say
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Join thousands of successful learners who have transformed their skills with Skillyug
+              Join thousands of successful learners who have transformed their skills with Orchid
             </p>
           </div>
 
@@ -290,7 +290,7 @@ const Home = () => {
               Ready to Transform Your Learning?
             </h2>
             <p className="text-xl text-white/90 leading-relaxed">
-              Join Skillyug today and experience personalized education that adapts to your unique learning style.
+              Join Orchid today and experience personalized education that adapts to your unique learning style.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/courses">
