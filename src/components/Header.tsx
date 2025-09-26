@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-// ✅ IMPORT ShoppingCart icon
-import { Menu, X, BookOpen, User, LogOut, GraduationCap, ShoppingCart } from 'lucide-react';
+import { Menu, X, BookOpen, LogOut, GraduationCap, ShoppingCart, LayoutDashboard, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge'; // ✅ IMPORT Badge
+import { Badge } from '@/components/ui/badge';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -15,17 +14,20 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCart } from '@/pages/Cart'; // ✅ IMPORT useCart hook
+import { useCart } from '@/pages/Cart';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
-  const { getTotalItems, setIsCartOpen } = useCart(); // ✅ USE the cart hook
+  const { getTotalItems, setIsCartOpen } = useCart();
 
   const totalCartItems = getTotalItems();
 
-  // Base navigation items (UNCHANGED)
+  const handleLogout = () => {
+    logout();
+  };
+
   const baseNavigation = [
     { name: 'Home', href: '/' },
     { name: 'Courses', href: '/courses' },
@@ -34,121 +36,152 @@ const Header = () => {
     { name: 'Contact', href: '/contact' },
   ];
 
-  // Add My Learning if user is authenticated (UNCHANGED)
-  const navigation = isAuthenticated 
-    ? [
-        ...baseNavigation.slice(0, 2),
-        { name: 'My Learning', href: '/my-learning' },
-        ...baseNavigation.slice(2)
-      ]
-    : baseNavigation;
+  const currentPath = location.pathname;
 
-  const isActive = (path: string) => location.pathname === path;
-
-  const handleLogout = () => {
-    logout();
-    setIsMenuOpen(false);
+  // Function to render the user avatar/login button for the mobile header
+  const renderMobileUserAction = () => {
+    if (isAuthenticated) {
+      // User is logged in: show the Avatar dropdown
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
+                <AvatarFallback className="bg-primary/10 text-primary">{user?.name?.[0] || 'U'}</AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          {/* Dropdown content remains the same as desktop/previous mobile version */}
+          <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">{user?.name}</p>
+                <p className="text-xs leading-none text-muted-foreground">
+                  {user?.email}
+                </p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <Link to="/dashboard">
+              <DropdownMenuItem onClick={() => setIsMenuOpen(false)}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+              </DropdownMenuItem>
+            </Link>
+            <Link to="/my-learning">
+              <DropdownMenuItem onClick={() => setIsMenuOpen(false)}>
+                  <GraduationCap className="mr-2 h-4 w-4" />
+                  <span>My Learning</span>
+              </DropdownMenuItem>
+            </Link>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    } else {
+      // User is not logged in: show a visible Login icon
+      return (
+        <Link to="/login">
+          <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+            <User className="h-5 w-5" />
+          </Button>
+        </Link>
+      );
+    }
   };
 
-  const getUserInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo (UNCHANGED) */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <BookOpen className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold font-display text-primary">Orchid</span>
+          
+          {/* Logo and Branding */}
+          <Link to="/" className="flex items-center space-x-2 text-lg font-bold">
+            <BookOpen className="h-6 w-6 text-primary" />
+            <span className="font-display">Orchid</span>
           </Link>
 
-          {/* Desktop Navigation (UNCHANGED) */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1">
+            {baseNavigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary flex items-center gap-1",
-                  isActive(item.href) ? "text-primary" : "text-muted-foreground"
+                  'px-3 py-2 text-sm font-medium transition-colors hover:text-primary',
+                  currentPath === item.href ? 'text-primary font-bold' : 'text-foreground'
                 )}
               >
-                {item.name === 'My Learning' && (
-                  <GraduationCap className="h-4 w-4" />
-                )}
                 {item.name}
               </Link>
             ))}
           </nav>
 
-          {/* Desktop Actions (UPDATED) */}
-          <div className="hidden md:flex items-center space-x-2">
-            {/* ✅ NEW: Cart Button is ADDED here */}
+          {/* Desktop Right Side Actions */}
+          <div className="hidden md:flex items-center space-x-3">
+            {/* Cart Button */}
             <Button
               variant="ghost"
               size="sm"
-              className="relative h-9 w-9 p-0"
+              className="relative"
               onClick={() => setIsCartOpen(true)}
             >
               <ShoppingCart className="h-5 w-5" />
               {totalCartItems > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-4 w-4 rounded-full p-0 flex items-center justify-center text-xs">
+                <Badge
+                  variant="default"
+                  className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                >
                   {totalCartItems}
                 </Badge>
               )}
-              <span className="sr-only">Open cart</span>
             </Button>
 
-            {/* All original authentication buttons are preserved */}
+            {/* Desktop User/Login Logic (Same as before) */}
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.avatar} alt={user?.name} />
-                      <AvatarFallback>
-                        {user?.name ? getUserInitials(user.name) : 'U'}
-                      </AvatarFallback>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={user?.avatar} alt={user?.name || 'User'} />
+                      <AvatarFallback className="bg-primary/10 text-primary">{user?.name?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user?.name}</p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
+                 <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user?.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user?.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <Link to="/dashboard">
+                      <DropdownMenuItem>
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          <span>Dashboard</span>
+                      </DropdownMenuItem>
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/my-learning" className="flex items-center">
-                      <GraduationCap className="mr-2 h-4 w-4" />
-                      <span>My Learning</span>
+                    <Link to="/my-learning">
+                      <DropdownMenuItem>
+                          <GraduationCap className="mr-2 h-4 w-4" />
+                          <span>My Learning</span>
+                      </DropdownMenuItem>
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-2">
@@ -166,8 +199,31 @@ const Header = () => {
             )}
           </div>
 
-          {/* Mobile menu button (UNCHANGED) */}
-          <div className="md:hidden">
+          {/* Mobile menu and Action Buttons */}
+          <div className="md:hidden flex items-center space-x-2">
+            
+            {/* 1. Mobile Cart Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="relative"
+              onClick={() => setIsCartOpen(true)}
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {totalCartItems > 0 && (
+                <Badge
+                  variant="default"
+                  className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                >
+                  {totalCartItems}
+                </Badge>
+              )}
+            </Button>
+
+            {/* 2. Mobile User/Login Icon (Always visible) */}
+            {renderMobileUserAction()}
+
+            {/* 3. Mobile Menu Button (Hamburger) */}
             <Button
               variant="ghost"
               size="sm"
@@ -178,11 +234,32 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation (UNCHANGED) */}
+        {/* Mobile Navigation (Collapsible Menu Content) - 💡 UPDATED HERE */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            {/* The rest of the mobile menu code is also unchanged */}
-            {/* ... */}
+          <div className={cn(
+            "md:hidden absolute top-16 left-0 right-0 z-50 bg-background shadow-lg border-t",
+            "transition-transform duration-300 ease-in-out"
+          )}>
+            <nav className="flex flex-col p-4 space-y-2">
+              {/* Base Links ONLY */}
+              {baseNavigation.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={cn(
+                    'block px-3 py-2 text-base font-medium transition-colors hover:bg-accent hover:text-primary rounded-md',
+                    currentPath === item.href ? 'bg-accent text-primary font-bold' : 'text-foreground'
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+              
+              {/* 💡 REMOVED: Dashboard, My Learning, and Logout buttons are now only in the Profile Dropdown (renderMobileUserAction) */}
+              {/* 💡 REMOVED: The Login/Signup buttons are also removed from here as the icon is permanently visible */}
+              
+            </nav>
           </div>
         )}
       </div>
