@@ -38,7 +38,7 @@ const Header = () => {
 
   const currentPath = location.pathname;
 
-  // Function to render the user avatar/login button for the mobile header
+  // Function to render the user avatar/login button for the mobile header (remains the same)
   const renderMobileUserAction = () => {
     if (isAuthenticated) {
       // User is logged in: show the Avatar dropdown
@@ -52,7 +52,7 @@ const Header = () => {
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          {/* Dropdown content remains the same as desktop/previous mobile version */}
+          {/* Dropdown content (remains the same: Dashboard, My Learning, Logout) */}
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
@@ -101,13 +101,13 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           
-          {/* Logo and Branding */}
+          {/* Logo and Branding (Remains the same) */}
           <Link to="/" className="flex items-center space-x-2 text-lg font-bold">
             <BookOpen className="h-6 w-6 text-primary" />
             <span className="font-display">Orchid</span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - 💡 MODIFIED HERE */}
           <nav className="hidden md:flex items-center space-x-1">
             {baseNavigation.map((item) => (
               <Link
@@ -121,11 +121,25 @@ const Header = () => {
                 {item.name}
               </Link>
             ))}
+            
+            {/* 💡 NEW: My Learning in Desktop Menu */}
+            {isAuthenticated && (
+              <Link
+                to="/my-learning"
+                className={cn(
+                  'px-3 py-2 text-sm font-medium transition-colors hover:text-primary border-l ml-3 pl-4',
+                  currentPath === '/my-learning' ? 'text-primary font-bold' : 'text-foreground'
+                )}
+              >
+                My Learning
+              </Link>
+            )}
+
           </nav>
 
-          {/* Desktop Right Side Actions */}
+          {/* Desktop Right Side Actions (Remains the same) */}
           <div className="hidden md:flex items-center space-x-3">
-            {/* Cart Button */}
+            {/* Cart Button (Remains the same) */}
             <Button
               variant="ghost"
               size="sm"
@@ -143,7 +157,7 @@ const Header = () => {
               )}
             </Button>
 
-            {/* Desktop User/Login Logic (Same as before) */}
+            {/* Desktop User/Login Logic (Remains the same) */}
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -199,7 +213,7 @@ const Header = () => {
             )}
           </div>
 
-          {/* Mobile menu and Action Buttons */}
+          {/* Mobile menu and Action Buttons (Remains the same) */}
           <div className="md:hidden flex items-center space-x-2">
             
             {/* 1. Mobile Cart Button */}
@@ -234,14 +248,14 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation (Collapsible Menu Content) - 💡 UPDATED HERE */}
+        {/* Mobile Navigation (Collapsible Menu Content) - 💡 FIX APPLIED HERE */}
         {isMenuOpen && (
           <div className={cn(
             "md:hidden absolute top-16 left-0 right-0 z-50 bg-background shadow-lg border-t",
             "transition-transform duration-300 ease-in-out"
           )}>
             <nav className="flex flex-col p-4 space-y-2">
-              {/* Base Links ONLY */}
+              {/* Base Links */}
               {baseNavigation.map((item) => (
                 <Link
                   key={item.name}
@@ -256,8 +270,17 @@ const Header = () => {
                 </Link>
               ))}
               
-              {/* 💡 REMOVED: Dashboard, My Learning, and Logout buttons are now only in the Profile Dropdown (renderMobileUserAction) */}
-              {/* 💡 REMOVED: The Login/Signup buttons are also removed from here as the icon is permanently visible */}
+              {/* 💡 My Learning link shown on mobile if authenticated */}
+              {isAuthenticated && (
+                <Link 
+                  to="/my-learning" 
+                  onClick={() => setIsMenuOpen(false)} 
+                  className="flex items-center px-3 py-2 text-base font-medium hover:bg-accent rounded-md border-t pt-2 mt-2 text-primary"
+                >
+                  <GraduationCap className="mr-2 h-4 w-4" />
+                  My Learning
+                </Link>
+              )}
               
             </nav>
           </div>
